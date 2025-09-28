@@ -1,160 +1,150 @@
-# Bankamatik uygulaması
+# Bank ATM Application
 
-# Hesap bilgileri tutulacak (dict)
-# menu , paraCekme , bakiyeSorgulama , paraYatirma fonksiyonları tanımlanacak.
-# çekilmek istenen tutar hesapta yoksa ek hesabın kullanılmak istendiği sorulacak.
+# Account information will be stored (dict)
+# menu, withdraw_money, check_balance, deposit_money functions will be defined.
+# If the requested withdrawal amount is not in the account, it will ask if the overdraft should be used.
 
-hesaplar = [
+accounts = [
 {
-    "isim" : "Gökçe Sarıçam",
-    "hesapNo" : "12345", #str
-    "bakiye" : 20000, #int
-    "ekHesap" : 5000,
+    "name" : "Gökçe Sarıçam",
+    "account_no" : "12345", #str
+    "balance" : 20000, #int
+    "overdraft" : 5000,
     "username" : "gokcesaricam",
     "password" : "1234",
-    "ekHesapLimit" : 10000
+    "overdraft_limit" : 10000
 }
-# {
-#     "isim" : "Ekin Koçyiğit",
-#     "hesapNo" : "12345", #str
-#     "bakiye" : 30000, #int
-#     "ekHesap" : 10000,
-#     "username" : "ekinkocyigit",
-#     "password" : "1234",
-#     "ekHesapLimit" : 15000
-# }
 ]
 
-def kayitOl():
-    print("\n=== KAYIT OL ===")
-    isim = input("Adınız ve Soyadınız: ")
-    username = input("Kullanıcı adı: ")
+def register():
+    print("\n=== REGISTER ===")
+    name = input("Full Name: ")
+    username = input("Username: ")
 
-    # Kullanıcı adı kontrolü (Zaten kayıtlı mı?)
-    for hesap in hesaplar:
-        if hesap["username"] == username:
-            print("Bu kullanıcı adı zaten alınmış! Lütfen başka bir isim deneyin.")
-            return kayitOl()
+    # Username check (Already taken?)
+    for account in accounts:
+        if account["username"] == username:
+            print("This username is already taken! Please try another.")
+            return register()
 
-    password = input("Şifre: ")
-    hesapNo = str(len(hesaplar) + 10000)  # Otomatik hesap numarası
-    bakiye = float(input("Başlangıç bakiyenizi giriniz: "))
-    ekHesapLimit = float(input("Ek hesap limitinizi giriniz: "))
+    password = input("Password: ")
+    account_no = str(len(accounts) + 10000)  # Auto account number
+    balance = float(input("Enter initial balance: "))
+    overdraft_limit = float(input("Enter overdraft limit: "))
 
-    yeni_hesap = {
-        "isim": isim,
-        "hesapNo": hesapNo,
-        "bakiye": bakiye,
-        "ekHesap": ekHesapLimit,
+    new_account = {
+        "name": name,
+        "account_no": account_no,
+        "balance": balance,
+        "overdraft": overdraft_limit,
         "username": username,
         "password": password,
-        "ekHesapLimit": ekHesapLimit
+        "overdraft_limit": overdraft_limit
     }
 
-    hesaplar.append(yeni_hesap)
-    print("\n Kayıt tamamlandı! Şimdi giriş yapabilirsiniz.")
+    accounts.append(new_account)
+    print("\n Registration completed! You can now log in.")
 
-def menu(hesap):
+def main_menu(account):
     while True:
-        print("\n=== ANA MENÜ ===")
-        print(f"Merhaba,{hesap["isim"]}!")
-        print("1 : Bakiye Sorgulama")
-        print("2 : Para Çekme")
-        print("3 : Para Yatırma")
-        print("4 : Çıkış")
+        print("\n=== MAIN MENU ===")
+        print(f"Hello, {account['name']}!")
+        print("1 : Check Balance")
+        print("2 : Withdraw Money")
+        print("3 : Deposit Money")
+        print("4 : Exit")
 
-        islem = input("Yapmak istediğiniz işlem(1-4): ")
+        choice = input("Select an option (1-4): ")
 
-        if islem == "1":
-            bakiyeSorgulama(hesap)
-        elif islem == "2":
-            paraCekme(hesap)
-        elif islem == "3":
-            paraYatirma(hesap)
-        elif islem == "4":
-            print("Çıkış yapılıyor...")
+        if choice == "1":
+            check_balance(account)
+        elif choice == "2":
+            withdraw_money(account)
+        elif choice == "3":
+            deposit_money(account)
+        elif choice == "4":
+            print("Exiting...")
             break    
         else:
-            print("Hatalı bir tuşlama yaptınız.(1-4)")
-        if not devamMi():
-            print("Çıkış yapılıyor...")
+            print("Invalid selection! (1-4)")
+        if not continue_menu():
+            print("Exiting...")
             break
 
-def devamMi():
+def continue_menu():
     while True:
-        secim = input("\nAna menüye dönmek ister misiniz? (E/H): ").strip().upper()
-        if secim == "E":
+        selection = input("\nReturn to main menu? (Y/N): ").strip().upper()
+        if selection == "Y":
             return True
-        elif secim == "H":
+        elif selection == "N":
             return False
         else:
-            print("Geçersiz giriş! Lütfen 'E' veya 'H' giriniz.")
+            print("Invalid input! Please enter 'Y' or 'N'.")
 
-def paraYatirma(hesap):
-    tutar = float(input("Yatırmak istediğiniz tutarı giriniz: "))
+def deposit_money(account):
+    amount = float(input("Enter the amount to deposit: "))
+    account["balance"] += amount
+    print(f"Deposit successful. New balance: {account['balance']}")
 
-    hesap["bakiye"] += tutar
-    print(f"Para yatırma işlemi başarılı. Yeni bakiyeniz: {hesap['bakiye']} TL")
+def check_balance(account):
+    print(f"Balance: {account['balance']}")
+    print(f"Overdraft: {account['overdraft']}")
 
-def bakiyeSorgulama(hesap):
-    print(f"Bakiye bilgisi: {hesap["bakiye"]} TL")
-    print(f"Ek bakiye: {hesap["ekHesap"]} TL")
+def withdraw_money(account):
+    amount = float(input("Enter the amount to withdraw: "))
 
-def paraCekme(hesap):
-    miktar = float(input("Çekmek istediğiniz miktar: "))
-
-    if hesap["bakiye"] >= miktar:
-        hesap["bakiye"] -= miktar
-        print("Paranızı alabilirsiniz.")
+    if account["balance"] >= amount:
+        account["balance"] -= amount
+        print("You can take your money.")
     else:
-        toplam = hesap["bakiye"] + hesap["ekHesap"]
-        if toplam >= miktar:
-            ekHesapKullanimIzni = input("Ek hesap kullanılsın mı? (E/H): ").strip().upper()
-            if ekHesapKullanimIzni == "E":
-                kullanilacakMiktar = miktar - hesap["bakiye"]
-                hesap["bakiye"] = 0
-                hesap["ekHesap"] -= kullanilacakMiktar
-                print("Paranızı alabilirsiniz.")
-            elif ekHesapKullanimIzni == "H":
-                print("İzin verilmedi,bakiye yetersiz")
+        total = account["balance"] + account["overdraft"]
+        if total >= amount:
+            use_overdraft = input("Use overdraft? (Y/N): ").strip().upper()
+            if use_overdraft == "Y":
+                used_amount = amount - account["balance"]
+                account["balance"] = 0
+                account["overdraft"] -= used_amount
+                print("You can take your money.")
+            elif use_overdraft == "N":
+                print("Not allowed, insufficient balance.")
             else:
-                print("Yanlış ya da eksik bir tuşlama yaptınız.")
+                print("Invalid input.")
         else:
-            print("Bakiye yetersiz.")
+            print("Insufficient balance.")
 
 
 def login():
      while True:
-        print("\n=== GİRİŞ EKRANI ===")
-        print("1: Giriş Yap")
-        print("2: Kayıt Ol")
-        print("3: Çıkış")
+        print("\n=== LOGIN SCREEN ===")
+        print("1: Log In")
+        print("2: Register")
+        print("3: Exit")
 
-        secim = input("Seçiminizi yapınız (1-3): ")
+        choice = input("Select an option (1-3): ")
 
-        if secim == "1":
-            username = input("Kullanıcı Adı: ")
-            password = input("parola: ")
+        if choice == "1":
+            username = input("Username: ")
+            password = input("Password: ")
 
-
-            for hesap in  hesaplar:
-                if hesap["username"] == username and hesap["password"] == password:
-                    print("Giriş başarılı!")
-                    menu(hesap)
+            for account in  accounts:
+                if account["username"] == username and account["password"] == password:
+                    print("Login successful!")
+                    main_menu(account)
                     return
             
-            print("Hatalı kullanıcı adı veya parola! Tekrar deneyin.")
-        elif secim == "2":
-            kayitOl()
+            print("Incorrect username or password! Please try again.")
+        elif choice == "2":
+            register()
 
-        elif secim == "3":
-            print("Çıkış yapılıyor...")
+        elif choice == "3":
+            print("Exiting...")
             break
         else:
-            print("Geçersiz giriş! Lütfen 1-3 arasında bir seçim yapın.")
+            print("Invalid input! Please select between 1-3.")
 
 
 login()
+
 
 
 
